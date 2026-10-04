@@ -1,3 +1,11 @@
+# ии-поддержка-сайта.рф
+
+Russian content is implemented in `app/Custom`: home, services, how it works, contact and six service detail pages. See [site-specific development and verification notes](app/Custom/README.md). The content is static; AI-agent integration and visual design are deferred.
+
+For page development run only `app`, or use `npm run dev` locally. Hot reload is configured. The original template documentation below is retained as background and includes capabilities and routes that are not active on this site.
+
+---
+
 # HAIH Site
 
 **Build better software with AI — by starting from requirements, not frameworks.**

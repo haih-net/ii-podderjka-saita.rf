@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://haih.site/sitemap.xml
+Sitemap: https://xn-----7kcbauaijpauj5couvu.xn--p1ai/sitemap.xml

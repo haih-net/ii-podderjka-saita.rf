@@ -1,9 +1,14 @@
-export const site = {
-  origin: 'https://haih.site',
-  name: 'HAIH',
-  language: 'en',
+export const site: {
+  origin: string
+  name: string
+  language: string
+  description: string
+} = {
+  origin: new URL('https://ии-поддержка-сайта.рф').origin,
+  name: 'ИИ-поддержка сайта',
+  language: 'ru',
   description:
-    'Building a website with AI, starting from requirements. Explore the working implementation, technology choices, experiments and lessons from HAIH.',
+    'Сопровождение сайта с ИИ и практическим опытом Николая Fi1osof Ланца: исправления, обновления и развитие.',
 }
 
 // Preserve the identity published at https://fi1osof.ru/about.
