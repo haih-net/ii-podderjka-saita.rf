@@ -1,5 +1,8 @@
 import type * as React from 'react'
-import { DocumentStyled } from './Custom/components/SiteLayout/styles'
+import {
+  DocumentStyled,
+  UnavailableStyled,
+} from './Custom/components/SiteLayout/styles'
 import { SeoHeaders, unavailableSeoMeta } from './components/seo/SeoHeaders'
 
 export const meta = unavailableSeoMeta
@@ -50,7 +53,7 @@ export default App
 export const ErrorBoundary: React.FC = () => {
   const error = useRouteError()
   return (
-    <>
+    <UnavailableStyled>
       <h1 tabIndex={-1}>
         {isRouteErrorResponse(error)
           ? `${error.status} — Не удалось открыть страницу`
@@ -58,6 +61,6 @@ export const ErrorBoundary: React.FC = () => {
       </h1>
       <p>Обновите страницу, чтобы попробовать ещё раз.</p>
       <a href="/">На главную</a>
-    </>
+    </UnavailableStyled>
   )
 }

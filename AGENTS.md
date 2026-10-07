@@ -165,3 +165,7 @@ Record implemented decisions, their motivating needs, known limitations, and rep
 Use focused commits for coherent changes and versioned releases for reproducible milestones when requested as part of the workflow. Do not publish, deploy, or create remote releases merely because a local build succeeds.
 
 Gradually turn verified implementation knowledge into English Solution pages. Keep documentation proportional to the project's current complexity.
+
+## Visitor-facing copy: no production commentary
+
+Do not add unsolicited captions or interface copy explaining that an image was AI-generated, that a section is a mockup, or how the page was produced. For example, do not render “Иллюстрация обновления сайта, созданная с помощью ИИ”. Keep image prompts, generation details and implementation notes in source files and internal documentation. Visitor-facing text must explain the offer or help the visitor act. Preserve useful image alternative text and factual service information; do not replace production commentary with invented claims about real people, projects or results.

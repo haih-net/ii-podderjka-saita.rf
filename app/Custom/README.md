@@ -1,39 +1,39 @@
-# Site customization
+# Содержание сайта ии-поддержка-сайта.рф
 
-This directory owns the Russian content for `ии-поддержка-сайта.рф`, as agreed with the owner for the Russian market.
+`pages/HomePage/index.tsx` — оформленная главная страница. Основание: направление сопровождения в маркетинговой Wiki (`/wiki/services/site-care`). `components/SiteLayout/` отвечает за общую типографику и фокус. Метаданные главной находятся в `app/routes/_index.tsx`.
 
-- `pages/HomePage/`: the offer, experience, price guidance and entry points.
-- `pages/ServicesPage/`: six support areas with section links.
-- `pages/HowItWorksPage/`: onboarding and FAQ.
-- `pages/ServiceDetails/`: six separate support topics.
-- `pages/ContactPage/`: direct contact.
-- `components/SiteLayout/`: shared navigation, focus handling, footer and minimal Linaria typography.
+Базовая задача создания и последующего размещения всех типовых сайтов этой части: `/wiki/tasks/site-care-website` в проекте `/disks/wd-1000/www/haih/marketing`. Там сохраняются промежуточные цели, способы работы, результаты и выводы. Подготовка сервера остаётся отдельной задачей `/wiki/tasks/server-bootstrap`.
 
-Route adapters remain in `app/routes/`. `app/routes.ts` enables `/`, `/services`, `/how-it-works`, `/contact`, six `/services/*` detail pages and a 404 route. Inherited HAIH page source is retained but is not registered or included in the sitemap. Page components use named exports; the existing React Router integration requires default exports at framework entry points.
+## Текущий этап — 7 октября 2026 года
 
-Content is kept in TSX files, without a content API or database. AI-agent integration, additional pages, generated images and visual design are deferred. Contact links currently lead to the contact page and the author's public Telegram profile; no message is sent automatically.
+После правок владельца основная тема — «ИИ-поддержка сайта», соответствующая домену и целевому запросу. Главная написана от первого лица. Основная аудитория — владельцы заброшенных сайтов, которым некогда заниматься развитием. Клиент решает передать сайт в работу; автор сам определяет состав и очередность работ ради большего числа заказов. Подбор задач не перекладывается на клиента. Цена — от 20 000 ₽ в месяц. Замечания, причины переработки и выводы сохранены в базовой Wiki-задаче. Текст остаётся черновиком для дальнейших правок.
 
-## Development
+## Структура и подача
 
-From the site root, use `npm ci` once and `npm run dev`. Only `app` is needed for Docker development:
+Each of the ten offer pages is a standalone landing page. Its main topic receives the most detail; supporting sections summarize the service, working process, experience, use of AI and starting price so visitors do not need to follow links to understand the offer. Detail links follow useful summaries instead of replacing them. Each offer page has at most three internal content links; the shared header separately provides the requested home, process, pricing and contact navigation. The pages use the approved light paper-workshop visual direction with cobalt accents. Result charts require real data.
 
-```bash
-docker compose -f docker/compose.yaml -f docker/compose.dev.yaml up -d app
-```
+Десять страниц предложения: `/`, `/how-it-works`, `/diagnostics`, `/repairs`, `/content`, `/development`, `/ai`, `/experience`, `/pricing`, `/contact`. Каждая — самостоятельная посадочная с темой, пользой, смысловыми ссылками и общим блоком будущего ИИ-чата. Добавлены общая sticky-шапка с переходом на главную, пунктами «Как работаю», «Стоимость» и видимыми контактами, а также подвал со ссылкой на fi1osof.ru. Контакт — Telegram `https://t.me/Fi1osof`, проверен по указанной владельцем странице `https://fi1osof.ru/about` 7 октября 2026 года.
 
-For simultaneous local sites, use free ports, for example `PORT=3101 HMR_PORT=24679 npm run dev`. `HMR_PORT` is optional and preserves Vite's default when omitted. Do not start the whole infrastructure just to edit pages.
+Предрендеринг и sitemap включают новые страницы. Унаследованные `/solutions` и `/blog` сохранены отдельно и не учитываются в десяти страницах предложения; их дальнейшая судьба остаётся открытой. Главная оформлена в выбранной владельцем светлой стилистике с кобальтовым акцентом и бумажной иллюстрацией. Промпт находится рядом с изображением; служебные подписи о генерации в интерфейс не выводятся. ИИ-помощник ещё не подключён. Страничные компоненты имеют именованные экспорты; тонкие адаптеры используют существующий обязательный для React Router экспорт по умолчанию на границе фреймворка.
 
-## Verification — 2026-10-05
+## Локальная работа
 
-Passed `npm run types`, `npm run build`, `npm run test:seo`, focused ESLint and `git diff --check`. Generated HTML includes Russian content, unique metadata, correct canonical URLs and extracted CSS. The tests also check internal links/fragments and 404 responses for unknown URLs and retired template routes.
+Из корня сайта: `npm ci`, затем `npm run dev`. Для Docker-разработки запускается только приложение: `docker compose -f docker/compose.yaml -f docker/compose.dev.yaml up -d app`. Свободные порты выбираются с учётом других сайтов.
 
-A local Chromium check covered direct navigation to all pages, SPA transitions without document reload, heading focus, metadata changes, page links, back/forward, 404, and absence of horizontal overflow at 360px and 1280px. Mobile screenshots were inspected. No page errors were observed. React hot updates were separately checked against the direct local development server.
+Проверки: `npm run types`, `npm run build`. Результаты текущей проверки фиксируются в базовой Wiki-задаче. Исторические проверки старого набора страниц не подтверждают работу текущего сайта. Размещение и производственный путь через прокси и кэш в рамках текстовой правки не проверяются.
 
-Production proxy/cache checks were not run. The inherited `npm test` suite targets the production Traefik/Varnish path and still requires that environment. Existing server/infrastructure behavior is outside this content change; no deployment was performed.
+## Основной способ общения — продающий ИИ-агент
 
+По уточнению владельца от 7 октября на всех сайтах позже появится продающий ИИ-чат. Посетитель сам задаёт вопросы агенту и разбирается в предложении. Личная связь с автором — дополнительная возможность, не основной призыв. Поддержку переданного сайта автор по-прежнему организует сам.
 
-## Search-space rules — 2026-10-05
+`components/AgentConversation/` показывает краткое описание будущего диалога и честный статус «Чат пока не подключён». Общая оболочка выводит блок на страницах, а контакты содержат собственное описание будущего чата. При подключении интерфейса диалог должен открываться прямо на любой странице; описание будущего чата не считается реализованной интеграцией.
 
-Public navigation must not use URL fragments. Topics referenced independently have separate pages. A keyboard skip button focuses the main region without changing the URL. Across the site, link to at most three other sites; each page may link to at most one, including header and footer links. The current external destinations are fi1osof.ru, modx.ru and t.me on different pages. `npm run test:seo` checks these rules, all ten prerendered pages and the sitemap.
+## Complete offer-page design — 7 October 2026
 
-Positioning includes practical AI expertise, integration of existing solutions and custom tools, alongside 19+ years of web and business-process experience. Search demand is recorded in the parent marketing search-space registry; no query frequencies were measured in this change.
+All ten offer pages now share the approved visual direction. The nine inner pages use `components/LandingPage/` for their viewport-height opening, topic sections and compact service context. Mobile layouts start with one column; wider layouts use paired editorial columns. The pricing page has a dedicated offer and refund panel. Experience uses the owner's portrait from the marketing Wiki materials. The repair and content illustrations were generated for these pages; Russian `.prompt.txt` files are colocated with their PNG originals. No production captions are rendered.
+
+The shared sticky header keeps contacts available. The footer links to the owner's website. Keyboard navigation includes a skip link, visible focus and heading focus after SPA navigation. Anchor offsets account for the header. Not-found and rendering-error pages share the visual treatment. The chat remains explicitly disconnected; no conversation backend is claimed. Inherited blog and Solutions content is preserved outside the ten offer pages.
+
+Validation: `npm run types`, `npm run build`, then a temporary production Node server with `PORT=4317 METRICS_PORT= NODE_ENV=production node build/node/index.js` and `PLAYWRIGHT_BASE_URL=http://127.0.0.1:4317 npx playwright test --workers=3`. All 45 browser checks pass in desktop Chromium, WebKit and mobile Chromium. Checks cover all ten direct URLs and refreshes, images, full-width layout, viewport-height heroes, sticky contacts, anchor offsets, SPA history/focus/metadata and 404 responses. Pricing also covers 320, 768 and 1024px widths. Local visual review covered 390 and 1440px; all ten pages were checked for overflow at 320, 390, 768 and 1440px. A tablet pricing overflow was corrected and regression-tested. Build output includes prerendered HTML and extracted CSS for the offer pages. These checks do not verify a deployment through the production proxy/cache chain.
+
+During local editing the style extractor retained a previous selector. Restarting the development process refreshed the extracted CSS; production-build browser checks passed independently. This is not evidence of reliable stylesheet HMR.
