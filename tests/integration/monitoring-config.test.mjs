@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdtemp, cp, readFile, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import test from 'node:test'
+import { test } from 'vitest'
 
 test('two sites sharing one Traefik have separate probes, metric labels and missing-data alerts', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'haih-config-'))

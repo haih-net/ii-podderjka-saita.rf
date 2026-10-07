@@ -11,6 +11,9 @@ module.exports = [
   {
     ignores: [
       'node_modules/**',
+      'coverage/**',
+      'playwright-report/**',
+      'test-results/**',
       'build/**',
       '.react-router/**',
       'storybook-static/**',

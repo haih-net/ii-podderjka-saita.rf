@@ -14,19 +14,25 @@
     "types": "npm run router:gen && tsc --noEmit",
     "types:watch": "npm run router:gen && tsc --noEmit --watch",
     "start": "cross-env NODE_ENV=production node build/node/index.js",
-    "test": "node --test tests/http.test.mjs",
+    "test": "vitest run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
-    "test:seo": "node --experimental-strip-types --test tests/seo.test.mjs",
     "monitoring:configure": "node scripts/configure-monitoring.mjs",
-    "test:monitoring": "node --test tests/monitoring/integration.test.mjs",
     "test:monitoring:failure": "node tests/monitoring/failure-check.mjs",
     "test:monitoring:notifications": "node tests/monitoring/notifications-check.mjs",
-    "test:monitoring:unit": "node --test tests/monitoring/config.test.mjs && tsx --test tests/monitoring/graphql.test.ts"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "npm run build && vitest run -c vitest.integration.config.cjs",
+    "test:integration:watch": "vitest -c vitest.integration.config.cjs",
+    "test:integration:stack": "vitest run -c vitest.stack.config.cjs",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:webkit": "playwright test --project=webkit",
+    "e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
@@ -50,6 +56,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "1.63.0",
     "@react-router/dev": "^8.4.0",
     "@storybook/react-vite": "^10.6.0",
     "@types/cors": "^2.8.19",
@@ -57,6 +64,7 @@
     "@types/node": "22.19.15",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.2.3",
+    "@vitest/coverage-v8": "5.0.3",
     "@wyw-in-js/vite": "^2.5.1",
     "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
@@ -67,6 +75,7 @@
     "storybook": "^10.6.0",
     "tsx": "^4.23.15",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.70.1",
+    "vitest": "5.0.3"
   }
 }

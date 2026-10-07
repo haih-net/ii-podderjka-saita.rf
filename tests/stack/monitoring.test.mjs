@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 import { setTimeout } from 'node:timers'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import test from 'node:test'
+import { test } from 'vitest'
 
 const base = process.env.MONITORING_TEST_URL ?? 'http://127.0.0.1:18080'
 const grafana = process.env.GRAFANA_TEST_URL ?? 'http://127.0.0.1:13000'

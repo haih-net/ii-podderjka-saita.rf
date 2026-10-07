@@ -7,7 +7,7 @@
     ".react-router/types/**/*",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
-    "tests/monitoring/**/*.ts"
+    "tests/**/*.ts"
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],

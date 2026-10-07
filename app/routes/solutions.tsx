@@ -1,7 +1,7 @@
 import type { MetaFunction } from 'react-router'
 import { createSeoMeta, unavailableSeoMeta } from '../components/seo/SeoHeaders'
 import type { SeoHandle } from '../components/seo/SeoHeaders'
-import SolutionsPage from '../pages/SolutionsPage'
+import { SolutionsPage } from '../pages/SolutionsPage'
 import { layers } from '../pages/SolutionsPage/solutions'
 import technologyMap from '../pages/MainPage/TechnologyMap/technology-map.webp'
 
@@ -9,7 +9,7 @@ export const handle = {
   seo: {
     title: 'Technology choices and their trade-offs — HAIH Solutions',
     description:
-      'Explore the React, Vite and Node.js choices behind HAIH: what each provides, what it requires, what has been checked and which decisions remain open.',
+      'Explore HAIH’s application runtime, testing and shared monitoring: capabilities, requirements, evidence and the open decisions behind GEO-friendly access.',
     path: '/solutions',
     image: {
       src: technologyMap,
@@ -34,4 +34,5 @@ export const handle = {
 
 export const meta: MetaFunction = ({ error }) =>
   error ? unavailableSeoMeta() : createSeoMeta(handle.seo)
-export default SolutionsPage
+// React Router requires a default export at the route integration boundary.
+export { SolutionsPage as default }

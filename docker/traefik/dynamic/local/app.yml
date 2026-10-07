@@ -3,9 +3,9 @@ http:
     app:
       rule: PathPrefix(`/`)
       entryPoints: &id001
-      - web
+        - web
       middlewares: &id002
-      - compress
+        - compress
       service: varnish
       priority: 1
     assets:
@@ -24,13 +24,13 @@ http:
     compress:
       compress:
         excludedContentTypes:
-        - text/event-stream
+          - text/event-stream
   services:
     app:
       loadBalancer:
         servers:
-        - url: http://haih-site-origin:3000
+          - url: http://haih-site-origin:3000
     varnish:
       loadBalancer:
         servers:
-        - url: http://haih-site-cache:80
+          - url: http://haih-site-cache:80

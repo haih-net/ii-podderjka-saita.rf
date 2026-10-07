@@ -20,6 +20,6 @@ All indexable pages have distinct descriptions and share the same description ac
 
 When adding a public page, update its route handle, prerender list and `public/sitemap.xml`. Keep `lastmod` absent unless a real content modification date is maintained. `robots.txt` announces the sitemap; it is not an access-control mechanism.
 
-Verification: `npm run types`, `npm run lint`, `npm run build`, then `npm run test:seo`. The SEO tests inspect the built HTML rather than the Vite endpoint and cover canonical uniqueness, JSON-LD escaping, author/ORCID, snapshot evidence and the unknown-route fallback. Browser navigation/hydration still needs a browser check; structured data does not guarantee a search rich result.
+Verification: `npm run types`, `npm run lint`, `npm test`, then `npm run test:integration`. The SEO tests inspect the built HTML rather than the Vite endpoint and cover canonical uniqueness, JSON-LD escaping, author/ORCID, snapshot evidence and the unknown-route fallback. `npm run e2e` checks browser navigation, hydration errors and metadata updates; structured data does not guarantee a search rich result.
 
 References: https://reactrouter.com/how-to/meta and https://developers.google.com/search/docs/appearance/structured-data/article

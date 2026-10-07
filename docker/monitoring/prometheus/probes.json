@@ -1,8 +1,6 @@
 [
   {
-    "targets": [
-      "http://traefik/"
-    ],
+    "targets": ["http://traefik/"],
     "labels": {
       "site": "haih.site",
       "probe": "page",
@@ -10,9 +8,7 @@
     }
   },
   {
-    "targets": [
-      "http://traefik/api"
-    ],
+    "targets": ["http://traefik/api"],
     "labels": {
       "site": "haih.site",
       "probe": "api",

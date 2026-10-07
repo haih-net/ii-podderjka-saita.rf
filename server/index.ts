@@ -57,7 +57,7 @@ async function startServer() {
     // Development: Vite dev server with HMR
     const { createServer: createVite } = await import('vite')
     vite = await createVite({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, ws: { server: httpServer } },
       appType: 'custom',
     })
 

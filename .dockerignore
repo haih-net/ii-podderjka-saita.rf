@@ -5,3 +5,6 @@ build
 
 docker/monitoring/.secrets
 docker/monitoring/alertmanager/generated.json
+
+docker/traefik/certs
+docker/traefik/logs

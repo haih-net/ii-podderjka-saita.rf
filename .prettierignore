@@ -3,3 +3,7 @@
 /.react-router
 /storybook-static
 package-lock.json
+
+coverage/
+playwright-report/
+test-results/

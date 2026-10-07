@@ -15,6 +15,8 @@ SITE_BIND_ADDRESS=127.0.0.1 SITE_PORT=18080 SITE_PORT_HTTPS=18443 \
 
 Use the existing `docker/.env` for `NETWORK_NAME` and the existing external Docker network. The command above selects free loopback ports for a production preview. Normal production uses the same base/prod files with the established 80/443 defaults. Development uses `compose.yaml` + `compose.dev.yaml` with project name `haih-site-dev` (Grafana defaults to loopback port 13001 and its default network is `haih-monitoring-dev`). Override `SITE_PORT`, `SITE_PORT_HTTPS`, `MONITORING_GRAFANA_PORT` or `MONITORING_NETWORK` when necessary. Check port availability first. Monitoring service definitions, volumes, labels and secrets live in `compose.yaml`; environment-specific ports/restarts remain in the dev/prod files.
 
+Development HTTP/HTTPS ports are 8080/8443 by default, with HMR on the same port as the page and Varnish in pass mode. See the [development proxy guide](../traefik/README.md#development-http-https-and-hmr). The default dev project name can be overridden by `COMPOSE_PROJECT_NAME` in `docker/.env` or by `-p`; use distinct names when running dev and production preview together.
+
 - Site: http://127.0.0.1:18080
 - Grafana: http://127.0.0.1:13000/d/haih-overview
 - Login: `admin`; generated password: `docker/monitoring/.secrets/grafana_admin_password`.
@@ -115,9 +117,9 @@ Diagnosis: compare page and API probes, then edge 5xx/latency, application logs/
 
 ```bash
 npm run types
-npm run test:monitoring:unit
-npm run test:monitoring
-TEST_URL=http://127.0.0.1:18080 npm test
+npm test
+npm run test:integration
+TEST_URL=http://haih.localhost npm run test:integration:stack
 # Pauses ONLY the preview app, checks alert delivery and then restores it:
 npm run test:monitoring:failure
 # Isolated local SMTP and Telegram API fixtures; never sends external messages:

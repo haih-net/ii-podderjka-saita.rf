@@ -3,14 +3,14 @@ services:
     build:
       context: ../
     env_file:
-    - .env
+      - .env
     init: true
     volumes:
-    - ../shared:/app/shared
+      - ../shared:/app/shared
     networks:
       default:
         aliases:
-        - haih-site-origin
+          - haih-site-origin
       external: null
     logging: &id001
       driver: json-file
@@ -26,13 +26,13 @@ services:
   traefik:
     image: traefik:v3.6.1
     volumes:
-    - ${TRAEFIK_STATIC_CONFIG:-./traefik/traefik.yml}:/etc/traefik/traefik.yml:ro
-    - ${TRAEFIK_DYNAMIC_DIR:-./traefik/dynamic/local}:/etc/traefik/dynamic:ro
-    - ./traefik/logs:/var/log/traefik
-    - ./traefik/certs:/etc/traefik/certs
+      - ${TRAEFIK_STATIC_CONFIG:-./traefik/traefik.yml}:/etc/traefik/traefik.yml:ro
+      - ${TRAEFIK_DYNAMIC_DIR:-./traefik/dynamic/local}:/etc/traefik/dynamic:ro
+      - ./traefik/logs:/var/log/traefik
+      - ./traefik/certs:/etc/traefik/certs
     networks:
-    - default
-    - external
+      - default
+      - external
     labels:
       traefik.enable: 'true'
       monitoring.logs: 'true'
@@ -41,17 +41,17 @@ services:
   varnish:
     image: varnish:7.7.3
     volumes:
-    - ./varnish/default.vcl:/etc/varnish/default.vcl:ro
-    - varnish-cache:/var/lib/varnish
+      - ./varnish/default.vcl:/etc/varnish/default.vcl:ro
+      - varnish-cache:/var/lib/varnish
     command: -s ${VARNISH_STORAGE:-file,/var/lib/varnish/cache,256M}
     expose:
-    - '80'
+      - '80'
     depends_on:
-    - app
+      - app
     networks:
       default:
         aliases:
-        - haih-site-cache
+          - haih-site-cache
       external: null
     logging: *id001
     labels:
@@ -61,65 +61,65 @@ services:
     logging: *id001
     image: prom/prometheus:v3.15.0
     command:
-    - --config.file=/etc/prometheus/prometheus.yml
-    - --storage.tsdb.path=/prometheus
-    - --storage.tsdb.retention.time=30d
-    - --storage.tsdb.retention.size=2GB
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --storage.tsdb.retention.size=2GB
     volumes:
-    - ./monitoring/prometheus:/etc/prometheus:ro
-    - prometheus-data:/prometheus
+      - ./monitoring/prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
   loki:
     logging: *id001
     image: grafana/loki:3.7.8
     command:
-    - -config.file=/etc/loki/config.yml
+      - -config.file=/etc/loki/config.yml
     volumes:
-    - ./monitoring/loki/config.yml:/etc/loki/config.yml:ro
-    - loki-data:/loki
+      - ./monitoring/loki/config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
   alloy:
     logging: *id001
     image: grafana/alloy:v1.20.1
     command:
-    - run
-    - --server.http.listen-addr=0.0.0.0:12345
-    - --storage.path=/var/lib/alloy
-    - /etc/alloy/config.alloy
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy
+      - /etc/alloy/config.alloy
     volumes:
-    - ./monitoring/alloy/config.alloy:/etc/alloy/config.alloy:ro
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - alloy-data:/var/lib/alloy
+      - ./monitoring/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy-data:/var/lib/alloy
     depends_on:
-    - loki
+      - loki
   blackbox:
     logging: *id001
     image: prom/blackbox-exporter:v0.28.0
     command:
-    - --config.file=/etc/blackbox/config.yml
+      - --config.file=/etc/blackbox/config.yml
     volumes:
-    - ./monitoring/blackbox/config.yml:/etc/blackbox/config.yml:ro
+      - ./monitoring/blackbox/config.yml:/etc/blackbox/config.yml:ro
   node-exporter:
     logging: *id001
     image: prom/node-exporter:v1.12.1
     command:
-    - --path.rootfs=/host
-    - --path.procfs=/host/proc
-    - --path.sysfs=/host/sys
-    - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/docker/netns|var/lib/docker/.+)($|/)
+      - --path.rootfs=/host
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/docker/netns|var/lib/docker/.+)($|/)
     volumes:
-    - /:/host:ro,rslave
+      - /:/host:ro,rslave
     pid: host
   alertmanager:
     logging: *id001
     image: prom/alertmanager:v0.34.1
     command:
-    - --config.file=/etc/alertmanager/generated.json
-    - --storage.path=/alertmanager
+      - --config.file=/etc/alertmanager/generated.json
+      - --storage.path=/alertmanager
     volumes:
-    - ./monitoring/alertmanager:/etc/alertmanager:ro
-    - alertmanager-data:/alertmanager
+      - ./monitoring/alertmanager:/etc/alertmanager:ro
+      - alertmanager-data:/alertmanager
     secrets:
-    - smtp_password
-    - telegram_bot_token
+      - smtp_password
+      - telegram_bot_token
   grafana:
     logging: *id001
     image: grafana/grafana:13.2.3
@@ -134,14 +134,14 @@ services:
       GF_PLUGINS_PREINSTALL_SYNC: prometheus@13.2.2,loki@13.2.1
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/overview.json
     secrets:
-    - grafana_admin_password
+      - grafana_admin_password
     volumes:
-    - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-    - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
-    - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
     depends_on:
-    - prometheus
-    - loki
+      - prometheus
+      - loki
 volumes:
   varnish-cache: null
   prometheus-data: null
