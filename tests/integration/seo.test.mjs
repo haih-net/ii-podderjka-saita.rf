@@ -1,26 +1,18 @@
 import { test, assert } from 'vitest'
 import { readFileSync, existsSync } from 'node:fs'
-<<<<<<< HEAD:tests/seo.test.mjs
-import { canonicalUrl, site } from '../app/components/seo/site.ts'
-import { serializeJsonLd } from '../app/components/seo/JsonLd/helpers.ts'
-
-const paths = [
-  '/',
-  '/services',
-  '/how-it-works',
-  '/contact',
-  '/website-lifecycle',
-  '/services/reliability',
-  '/services/maintenance',
-  '/services/content',
-  '/services/improvements',
-  '/services/analytics',
-  '/services/modernization',
-=======
 import { author, canonicalUrl } from '../../app/components/seo/site.ts'
 
 const paths = [
   '/',
+  '/how-it-works',
+  '/diagnostics',
+  '/repairs',
+  '/content',
+  '/development',
+  '/ai',
+  '/experience',
+  '/pricing',
+  '/contact',
   '/solutions',
   '/blog',
   '/blog/two-protocols-one-development-loop',
@@ -29,7 +21,6 @@ const paths = [
   '/blog/a-small-site-and-the-limits-we-found',
   '/blog/one-server-two-modes-and-an-api',
   '/blog/eighteen-hours-a-real-portal-in-production',
->>>>>>> origin/main:tests/integration/seo.test.mjs
 ]
 const read = (path) =>
   readFileSync(
@@ -40,114 +31,82 @@ const read = (path) =>
     'utf8',
   )
 const headOf = (html) => html.match(/<head>([\s\S]*?)<\/head>/)[1]
+const graphOf = (head) =>
+  JSON.parse(
+    head.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1],
+  )['@graph']
 
-<<<<<<< HEAD:tests/seo.test.mjs
-test('canonical URLs normalize paths and reject other domains', () => {
-  assert.equal(
-    canonicalUrl('/services/?query=1#section'),
-    `${site.origin}/services`,
-  )
-  assert.throws(() => canonicalUrl('https://example.org/'))
-})
-
-test('structured data serialization escapes HTML', () => {
-  const data = { name: '</script><script>alert(1)</script>' }
-  const value = serializeJsonLd(data)
-  assert.ok(!value.includes('<'))
-  assert.deepEqual(JSON.parse(value), data)
-})
-
-test('all public pages prerender Russian content, unique metadata and extracted CSS', () => {
-  const titles = new Set()
-=======
 test('every public page has unique canonical and metadata in prerendered head', () => {
->>>>>>> origin/main:tests/integration/seo.test.mjs
   const descriptions = new Set()
   const sitemap = readFileSync(
     new URL('../../build/client/sitemap.xml', import.meta.url),
     'utf8',
   )
-  assert.equal((sitemap.match(/<loc>/g) || []).length, paths.length)
   for (const path of paths) {
     const html = read(path)
     const head = headOf(html)
     assert.match(html, /lang="ru"/)
     assert.equal((html.match(/<h1\b/g) || []).length, 1)
+    const styles = [...head.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)]
+    assert.ok(styles.length > 0)
+    for (const [, href] of styles) {
+      assert.ok(
+        existsSync(new URL(`../../build/client${href}`, import.meta.url)),
+      )
+    }
+    const canonical = canonicalUrl(path)
     assert.equal((head.match(/<title>/g) || []).length, 1)
     assert.equal((head.match(/rel="canonical"/g) || []).length, 1)
-    titles.add(head.match(/<title>(.*?)<\/title>/)[1])
-    descriptions.add(head.match(/name="description" content="([^"]+)"/)[1])
-    assert.ok(head.includes(`rel="canonical" href="${canonicalUrl(path)}"`))
-    assert.ok(!head.includes('https://haih.site'))
-    assert.ok(!head.includes('og:image'))
-    assert.ok(sitemap.includes(`<loc>${canonicalUrl(path)}</loc>`))
-    const graph = JSON.parse(
-      head.match(
-        /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
-      )[1],
-    )['@graph']
+    assert.ok(head.includes(`rel="canonical" href="${canonical}"`))
+    assert.ok(head.includes(`property="og:url" content="${canonical}"`))
+    assert.equal((head.match(/name="description"/g) || []).length, 1)
+    assert.equal((head.match(/application\/ld\+json/g) || []).length, 1)
+    assert.ok(!head.includes('localhost'))
+    const description = head.match(/name="description" content="([^"]+)"/)[1]
+    assert.ok(description.length > 60)
+    descriptions.add(description)
     assert.ok(
-<<<<<<< HEAD:tests/seo.test.mjs
-      graph.some(
-=======
       head.includes(`property="og:description" content="${description}"`),
     )
     assert.ok(
       head.includes(`name="twitter:description" content="${description}"`),
     )
-    const image = head.match(/property="og:image" content="([^"]+)"/)[1]
-    assert.equal(new URL(image).origin, 'https://haih.site')
-    assert.ok(
-      existsSync(
-        new URL(
-          `../../build/client${new URL(image).pathname}`,
-          import.meta.url,
+    if (path === '/solutions' || path.startsWith('/blog')) {
+      const image = head.match(/property="og:image" content="([^"]+)"/)[1]
+      assert.equal(
+        new URL(image).origin,
+        'https://xn-----7kcbauaijpauj5couvu.xn--p1ai',
+      )
+      assert.ok(
+        existsSync(
+          new URL(
+            `../../build/client${new URL(image).pathname}`,
+            import.meta.url,
+          ),
         ),
-      ),
-    )
-    assert.ok(head.includes('property="og:image:alt"'))
+      )
+      assert.ok(head.includes('property="og:image:alt"'))
+    } else {
+      assert.ok(!head.includes('property="og:image"'))
+    }
     assert.ok(
       graphOf(head).some(
->>>>>>> origin/main:tests/integration/seo.test.mjs
         (node) =>
-          node['@type'] === 'WebPage' &&
-          node.url === canonicalUrl(path) &&
-          node.inLanguage === 'ru',
+          ['WebPage', 'CollectionPage'].includes(node['@type']) &&
+          node.url === canonical,
       ),
     )
-    const styles = [...head.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)]
-    assert.ok(styles.length > 0)
-    for (const [, href] of styles)
-      assert.ok(existsSync(new URL(`../build/client${href}`, import.meta.url)))
+    assert.ok(sitemap.includes(`<loc>${canonical}</loc>`))
   }
-  assert.equal(titles.size, paths.length)
   assert.equal(descriptions.size, paths.length)
 })
 
-<<<<<<< HEAD:tests/seo.test.mjs
-test('internal links lead to published pages without fragment navigation', () => {
-  for (const path of paths) {
-    const html = read(path)
-    for (const [, href] of html.matchAll(/<a\b[^>]*href="([^"]+)"/g)) {
-      assert.ok(!href.includes('#'), `${path}: no fragment navigation: ${href}`)
-      if (!href.startsWith('/')) continue
-      const target = new URL(href, canonicalUrl(path))
-      assert.ok(paths.includes(target.pathname), `${path}: ${href}`)
-      if (target.hash)
-        assert.ok(
-          read(target.pathname).includes(`id="${target.hash.slice(1)}"`),
-          `${path}: ${href}`,
-        )
-    }
-  }
-})
-=======
 test('homepage describes the website, without presenting it as a software product', () => {
   const graph = graphOf(headOf(read('/')))
   const website = graph.find((node) => node['@type'] === 'WebSite')
-  assert.equal(website.name, 'HAIH')
-  assert.equal(website.url, 'https://haih.site/')
-  assert.ok(website.description.includes('requirements'))
+  assert.equal(website.name, 'ИИ-поддержка сайта')
+  assert.equal(website.url, 'https://xn-----7kcbauaijpauj5couvu.xn--p1ai/')
+  assert.ok(website.description.includes('Сопровождение сайта'))
   assert.ok(
     !graph.some((node) =>
       ['Product', 'SoftwareApplication', 'BlogPosting'].includes(node['@type']),
@@ -247,7 +206,10 @@ for (const [
     assert.equal(person['@id'], 'https://fi1osof.ru/about')
     assert.ok(person.sameAs.includes('https://orcid.org/0009-0007-9285-0801'))
     assert.equal(article.author['@id'], person['@id'])
-    assert.equal(article.isPartOf['@id'], 'https://haih.site/blog#blog')
+    assert.equal(
+      article.isPartOf['@id'],
+      'https://xn-----7kcbauaijpauj5couvu.xn--p1ai/blog#blog',
+    )
     assert.ok(html.includes(author.name))
     assert.ok(html.includes('>ORCID</a>'))
     assert.equal(article.about.version, version)
@@ -269,52 +231,23 @@ for (const [
     )
   })
 }
->>>>>>> origin/main:tests/integration/seo.test.mjs
 
-test('unknown pages and inherited template routes return 404 without canonical', async () => {
+test('unknown SSR route is 404 and noindex without a fabricated canonical or article', async () => {
   const { createRequestHandler } = await import('react-router')
-<<<<<<< HEAD:tests/seo.test.mjs
-  const build = await import('../build/server/index.js')
-  const handler = createRequestHandler(build, 'production')
-  for (const path of [
-    '/missing-page',
-    '/blog',
-    '/solutions',
-    '/missing-image.png',
-  ]) {
-    const response = await handler(new Request(`${site.origin}${path}`))
-    assert.equal(response.status, 404)
-    const head = headOf(await response.text())
-    assert.ok(head.includes('noindex'))
-    assert.ok(!head.includes('rel="canonical"'))
-  }
-})
-
-test('outbound links respect one destination site per page and three per site', () => {
-  const destinations = new Set()
-  for (const path of paths) {
-    const perPage = new Set()
-    for (const [, href] of read(path).matchAll(/<a\b[^>]*href="([^"]+)"/g)) {
-      const target = new URL(href, site.origin)
-      if (target.origin === site.origin) continue
-      perPage.add(target.hostname)
-      destinations.add(target.hostname)
-    }
-    assert.ok(perPage.size <= 1, `${path}: ${[...perPage]}`)
-  }
-  assert.ok(destinations.size <= 3, `${[...destinations]}`)
-=======
   const { createRequire } = await import('node:module')
   const build = createRequire(import.meta.url)('../../build/server/index.js')
   const response = await createRequestHandler(
     build,
     'production',
-  )(new globalThis.Request('https://haih.site/missing-seo-page'))
+  )(
+    new globalThis.Request(
+      'https://xn-----7kcbauaijpauj5couvu.xn--p1ai/missing-seo-page',
+    ),
+  )
   assert.equal(response.status, 404)
   const html = await response.text()
   const head = headOf(html)
   assert.ok(head.includes('noindex'))
   assert.ok(!head.includes('rel="canonical"'))
   assert.ok(!head.includes('BlogPosting'))
->>>>>>> origin/main:tests/integration/seo.test.mjs
 })

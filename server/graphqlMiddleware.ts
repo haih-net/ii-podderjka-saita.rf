@@ -39,7 +39,10 @@ export async function setupGraphqlMiddleware(
     cors<cors.CorsRequest>(),
     express.json(),
     expressMiddleware(apolloServer, {
-      context: async () => ({}),
+      context: async ({ req, res }) => {
+        res.setHeader('Cache-Control', 'no-store')
+        return { req }
+      },
     }),
   )
 

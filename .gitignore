@@ -15,3 +15,5 @@ docker/monitoring/alertmanager/generated.json
 coverage/
 playwright-report/
 test-results/
+
+!docker/.env.example

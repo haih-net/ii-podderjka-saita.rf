@@ -1,3 +1,4 @@
+import { Statistics } from './components/Statistics'
 import type * as React from 'react'
 import {
   DocumentStyled,
@@ -38,6 +39,7 @@ export const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       </head>
       <body>
         <SiteLayout>{children}</SiteLayout>
+        <Statistics />
         <ScrollRestoration />
         <Scripts />
       </body>

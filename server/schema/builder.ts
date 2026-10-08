@@ -1,9 +1,9 @@
+import type { Request } from 'express'
 import SchemaBuilder from '@pothos/core'
 import { DateTimeResolver, JSONResolver } from 'graphql-scalars'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Context {
-  // Extend as needed
+  req: Request
 }
 
 export const builder = new SchemaBuilder<{
