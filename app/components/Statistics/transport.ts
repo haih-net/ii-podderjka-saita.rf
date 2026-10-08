@@ -1,4 +1,6 @@
-export interface PageViewEvent {
+import type { PageOutcome } from './status'
+
+export interface PageViewEvent extends PageOutcome {
   eventId: 'page.viewed'
   eventKey: string
   timestamp: number

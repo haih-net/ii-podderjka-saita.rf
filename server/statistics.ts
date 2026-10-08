@@ -1,6 +1,10 @@
 import { GraphQLError } from 'graphql'
 import type { Request } from 'express'
 import {
+  isHttpStatusCode,
+  pageOutcome,
+} from '../app/components/Statistics/status'
+import {
   decodeStatisticsDomain,
   decodeStatisticsUrl,
 } from '../app/components/Statistics/domains'
@@ -50,6 +54,8 @@ const validatePacket = (data: unknown): StatisticsPacket => {
   if (
     !isRecord(event) ||
     event.eventId !== 'page.viewed' ||
+    !isHttpStatusCode(event.statusCode) ||
+    event.status !== pageOutcome(event.statusCode).status ||
     !validId(event.eventKey) ||
     typeof event.timestamp !== 'number' ||
     !Number.isSafeInteger(event.timestamp) ||
@@ -70,6 +76,7 @@ const validatePacket = (data: unknown): StatisticsPacket => {
   // Allow only visit fields; clients cannot inject identity or server metadata.
   const visit: PageViewEvent = {
     eventId: 'page.viewed',
+    ...pageOutcome(event.statusCode),
     eventKey: event.eventKey,
     timestamp: event.timestamp,
     url: event.url,
@@ -114,7 +121,7 @@ export const logStatistics = async (
         variables: {
           input: {
             type: event.eventId,
-            status: 'success',
+            status: event.status,
             data: {
               ...event,
               url: decodeStatisticsUrl(event.url),

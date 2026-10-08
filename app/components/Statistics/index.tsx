@@ -1,15 +1,17 @@
 import { useEffect } from 'react'
 import type * as React from 'react'
-import { useLocation } from 'react-router'
+import { useLocation, useMatches } from 'react-router'
 import { createStatisticsQueue, type StatisticsQueue } from './queue'
 import { sendStatistics } from './transport'
 import { decodeStatisticsUrl } from './domains'
+import { matchedPageStatusCode, pageOutcome } from './status'
 
 interface BrowserStatistics {
   visitorId: string
   tabId: string
   previousUrl: string
   currentUrl: string | null
+  currentStatusCode: number | null
   queue: StatisticsQueue
 }
 
@@ -47,19 +49,28 @@ const getStatistics = (): BrowserStatistics => {
     tabId: storedId('sessionStorage', 'agents-center.tab-id'),
     previousUrl: decodeStatisticsUrl(document.referrer.slice(0, 4096)),
     currentUrl: null,
+    currentStatusCode: null,
     queue: createStatisticsQueue(sendStatistics),
   }
   return statistics
 }
 
-export const Statistics: React.FC = () => {
+interface StatisticsProps {
+  statusCode?: number
+}
+
+export const Statistics: React.FC<StatisticsProps> = ({
+  statusCode: errorStatusCode,
+}) => {
   const { pathname, search } = useLocation()
+  const matches = useMatches()
+  const statusCode: number = errorStatusCode ?? matchedPageStatusCode(matches)
   useEffect(() => {
     const state: BrowserStatistics = getStatistics()
     const url: string = decodeStatisticsUrl(
       `${location.origin}${pathname}${search}`.slice(0, 4096),
     )
-    if (state.currentUrl === url) {
+    if (state.currentUrl === url && state.currentStatusCode === statusCode) {
       return
     }
     state.queue.enqueue({
@@ -68,6 +79,7 @@ export const Statistics: React.FC = () => {
       events: [
         {
           eventId: 'page.viewed',
+          ...pageOutcome(statusCode),
           eventKey: createId(),
           timestamp: Date.now(),
           url,
@@ -79,8 +91,9 @@ export const Statistics: React.FC = () => {
       ],
     })
     state.currentUrl = url
+    state.currentStatusCode = statusCode
     state.previousUrl = url
-  }, [pathname, search])
+  }, [pathname, search, statusCode])
 
   useEffect(() => {
     const flush = (): void => {

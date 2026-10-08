@@ -12,6 +12,8 @@ const packet: StatisticsPacket = {
   events: [
     {
       eventId: 'page.viewed',
+      statusCode: 200,
+      status: 'success',
       eventKey: 'c'.repeat(24),
       timestamp: 1,
       url: 'https://example.test/',

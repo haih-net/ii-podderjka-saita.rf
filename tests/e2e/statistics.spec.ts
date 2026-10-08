@@ -15,10 +15,7 @@ test('collects initial and SPA page visits without chat or duplicate hash events
   })
   await page.goto('/')
   await expect.poll(() => packets.length).toBe(1)
-  await page
-    .getByRole('navigation', { name: 'Основная навигация' })
-    .getByRole('link', { name: 'Стоимость' })
-    .click()
+  await page.locator('a[href="/pricing"]:visible').first().click()
   await expect.poll(() => packets.length).toBe(2)
   await page.goBack()
   await expect.poll(() => packets.length).toBe(3)
@@ -65,10 +62,7 @@ test('stops after three failed attempts and keeps navigation usable', async ({
   await page.waitForTimeout(3500)
   expect(keys).toHaveLength(3)
   expect(new Set(keys).size).toBe(1)
-  await page
-    .getByRole('navigation', { name: 'Основная навигация' })
-    .getByRole('link', { name: 'Стоимость' })
-    .click()
+  await page.locator('a[href="/pricing"]:visible').first().click()
   await expect(page).toHaveURL(/\/pricing$/)
 })
 
@@ -91,10 +85,7 @@ test('blocked storage does not break collection; disabled integration does not r
   })
   await page.goto('/')
   await expect.poll(() => requests).toBe(1)
-  await page
-    .getByRole('navigation', { name: 'Основная навигация' })
-    .getByRole('link', { name: 'Стоимость' })
-    .click()
+  await page.locator('a[href="/pricing"]:visible').first().click()
   await expect(page).toHaveURL(/\/pricing$/)
   await page.waitForTimeout(200)
   expect(requests).toBe(1)

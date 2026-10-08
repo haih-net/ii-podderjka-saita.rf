@@ -37,6 +37,8 @@ const packet = {
   events: [
     {
       eventId: 'page.viewed',
+      statusCode: 200,
+      status: 'success',
       eventKey: 'c'.repeat(24),
       timestamp: 1000,
       url: 'https://site.test/',
@@ -107,15 +109,13 @@ test('GraphQL forwards a visitor page view through createActivity with server-on
 
 test('GraphQL sends Unicode domains in every URL and site field to Agents Center', async () => {
   configured()
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          data: { createActivity: { id: 'unicode-activity' } },
-        }),
-      ),
-    )
+  const fetchMock = vi.fn().mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        data: { createActivity: { id: 'unicode-activity' } },
+      }),
+    ),
+  )
   vi.stubGlobal('fetch', fetchMock)
   const request: Request = Object.assign(Object.create(req) as Request, {
     headers: {
@@ -151,6 +151,61 @@ test('GraphQL sends Unicode domains in every URL and site field to Agents Center
   })
   expect(fetchMock).toHaveBeenCalledTimes(1)
 })
+
+test.each([200, 301, 399, 400, 401, 403, 404, 410, 500, 503])(
+  'preserves page status %i in the browser packet and the Activity status',
+  async (statusCode) => {
+    configured()
+    const status: string = statusCode >= 400 ? 'failed' : 'success'
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: { createActivity: { id: 'status-activity' } },
+        }),
+      ),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const result = await executeStatistics({
+      ...packet,
+      events: [{ ...packet.events[0], statusCode, status }],
+    })
+    expect(result.errors).toBeUndefined()
+    expect(result.data?.logStats).toEqual([{ id: 'status-activity' }])
+    const options: RequestInit = fetchMock.mock.calls[0][1] as RequestInit
+    const body = JSON.parse(String(options.body)) as {
+      variables: { input: { status: string; data: Record<string, unknown> } }
+    }
+    expect(body.variables.input).toMatchObject({
+      status,
+      data: { statusCode, status },
+    })
+  },
+)
+
+test.each([
+  { statusCode: undefined, status: undefined },
+  { statusCode: '404', status: 'failed' },
+  { statusCode: 99, status: 'success' },
+  { statusCode: 600, status: 'failed' },
+  { statusCode: 404.5, status: 'failed' },
+  { statusCode: 404, status: 'success' },
+  { statusCode: 200, status: 'failed' },
+  { statusCode: 200, status: 'pending' },
+])(
+  'rejects missing, invalid or contradictory page status %j',
+  async (outcome) => {
+    configured()
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(
+      logStatistics(
+        { ...packet, events: [{ ...packet.events[0], ...outcome }] },
+        req,
+      ),
+    ).rejects.toMatchObject({ extensions: { code: 'BAD_USER_INPUT' } })
+    expect(fetchMock).not.toHaveBeenCalled()
+  },
+)
 
 test.each([
   { ...packet, events: [...packet.events, ...packet.events] },

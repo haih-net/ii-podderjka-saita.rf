@@ -36,7 +36,7 @@ for (const [ascii, unicode] of domains) {
     await expect.poll(() => packets.length).toBe(1)
     expect(packets[0].events[0].url).toBe(`${decodedOrigin}/?next=xn--p1ai`)
     expect(packets[0].events[0].referrer).toBe('http://www.пример.рф/')
-    const link = page.locator('nav a[href^="/"]:not([href="/"])').first()
+    const link = page.locator('a[href="/pricing"]:visible').first()
     const destination: string | null = await link.getAttribute('href')
     await link.click()
     await expect.poll(() => packets.length).toBe(2)
