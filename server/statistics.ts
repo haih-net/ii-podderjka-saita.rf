@@ -1,5 +1,9 @@
 import { GraphQLError } from 'graphql'
 import type { Request } from 'express'
+import {
+  decodeStatisticsDomain,
+  decodeStatisticsUrl,
+} from './statisticsDomains'
 import type {
   StatisticsPacket,
   PageViewEvent,
@@ -93,6 +97,7 @@ export const logStatistics = async (
   }
   const packet: StatisticsPacket = validatePacket(data)
   const event: PageViewEvent = packet.events[0]
+  const requestReferer: string | undefined = req.get('referer')?.slice(0, 4096)
   let response: Response
   let body: unknown
   try {
@@ -112,14 +117,19 @@ export const logStatistics = async (
             status: 'success',
             data: {
               ...event,
+              url: decodeStatisticsUrl(event.url),
+              referrer: decodeStatisticsUrl(event.referrer),
               visitorId: packet.visitorId,
               tabId: packet.tabId,
-              site: req.hostname,
+              site: decodeStatisticsDomain(req.hostname),
               userId: null,
               authenticated: false,
               ip: req.ip ?? req.socket.remoteAddress ?? null,
               userAgent: req.get('user-agent')?.slice(0, 1000) ?? null,
-              requestReferer: req.get('referer')?.slice(0, 4096) ?? null,
+              requestReferer:
+                requestReferer === undefined
+                  ? null
+                  : decodeStatisticsUrl(requestReferer),
               receivedAt: new Date().toISOString(),
               occurredAt: new Date(event.timestamp).toISOString(),
             },

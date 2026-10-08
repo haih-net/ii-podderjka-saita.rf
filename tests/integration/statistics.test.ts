@@ -15,13 +15,14 @@ const req: Request = Object.assign(Object.create(express.request) as Request, {
 const api: ApolloServer<Context> = new ApolloServer<Context>({ schema })
 const executeStatistics = async (
   data: unknown,
+  request: Request = req,
 ): Promise<FormattedExecutionResult<Record<string, unknown>>> => {
   const response = await api.executeOperation(
     {
       query: 'mutation ($data: Json!) { logStats(data: $data) { id } }',
       variables: { data },
     },
-    { contextValue: { req } },
+    { contextValue: { req: request } },
   )
   if (response.body.kind !== 'single') {
     throw new Error('Expected a single response')
@@ -102,6 +103,53 @@ test('GraphQL forwards a visitor page view through createActivity with server-on
     },
   })
   expect(JSON.stringify(result)).not.toContain('fixture-secret')
+})
+
+test('GraphQL sends Unicode domains in every URL and site field to Agents Center', async () => {
+  configured()
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: { createActivity: { id: 'unicode-activity' } },
+        }),
+      ),
+    )
+  vi.stubGlobal('fetch', fetchMock)
+  const request: Request = Object.assign(Object.create(req) as Request, {
+    headers: {
+      ...req.headers,
+      host: 'xn-----7kcbauaijpauj5couvu.xn--p1ai:3000',
+      referer: 'https://xn-----7kcbauaijpauj5couvu.xn--p1ai/pricing',
+    },
+  })
+  const result = await executeStatistics(
+    {
+      ...packet,
+      events: [
+        {
+          ...packet.events[0],
+          url: 'https://xn-----7kcbauaijpauj5couvu.xn--p1ai/pricing?next=xn--p1ai',
+          referrer: 'https://www.xn--e1afmkfd.xn--p1ai/%D0%BF?q=%2F',
+        },
+      ],
+    },
+    request,
+  )
+  expect(result.errors).toBeUndefined()
+  expect(result.data?.logStats).toEqual([{ id: 'unicode-activity' }])
+  const options: RequestInit = fetchMock.mock.calls[0][1] as RequestInit
+  const body = JSON.parse(String(options.body)) as {
+    variables: { input: { data: Record<string, unknown> } }
+  }
+  expect(body.variables.input.data).toMatchObject({
+    site: 'ии-поддержка-сайта.рф',
+    url: 'https://ии-поддержка-сайта.рф/pricing?next=xn--p1ai',
+    referrer: 'https://www.пример.рф/%D0%BF?q=%2F',
+    requestReferer: 'https://ии-поддержка-сайта.рф/pricing',
+  })
+  expect(fetchMock).toHaveBeenCalledTimes(1)
 })
 
 test.each([
