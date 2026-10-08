@@ -3,6 +3,7 @@ import type * as React from 'react'
 import { useLocation } from 'react-router'
 import { createStatisticsQueue, type StatisticsQueue } from './queue'
 import { sendStatistics } from './transport'
+import { decodeStatisticsUrl } from './domains'
 
 interface BrowserStatistics {
   visitorId: string
@@ -44,7 +45,7 @@ const getStatistics = (): BrowserStatistics => {
   statistics ??= {
     visitorId: storedId('localStorage', 'agents-center.visitor-id'),
     tabId: storedId('sessionStorage', 'agents-center.tab-id'),
-    previousUrl: document.referrer.slice(0, 4096),
+    previousUrl: decodeStatisticsUrl(document.referrer.slice(0, 4096)),
     currentUrl: null,
     queue: createStatisticsQueue(sendStatistics),
   }
@@ -55,7 +56,9 @@ export const Statistics: React.FC = () => {
   const { pathname, search } = useLocation()
   useEffect(() => {
     const state: BrowserStatistics = getStatistics()
-    const url: string = `${location.origin}${pathname}${search}`.slice(0, 4096)
+    const url: string = decodeStatisticsUrl(
+      `${location.origin}${pathname}${search}`.slice(0, 4096),
+    )
     if (state.currentUrl === url) {
       return
     }

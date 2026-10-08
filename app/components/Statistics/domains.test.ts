@@ -1,8 +1,12 @@
-import { expect, test } from 'vitest'
-import {
-  decodeStatisticsDomain,
-  decodeStatisticsUrl,
-} from './statisticsDomains'
+import { afterEach, expect, test, vi } from 'vitest'
+import { toUnicode } from 'punycode/punycode.es6.js'
+import { decodeStatisticsDomain, decodeStatisticsUrl } from './domains'
+
+vi.mock('punycode/punycode.es6.js', { spy: true })
+afterEach(() => {
+  vi.unstubAllGlobals()
+  vi.restoreAllMocks()
+})
 
 test.each([
   ['xn-----7kcbauaijpauj5couvu.xn--p1ai', 'ии-поддержка-сайта.рф'],
@@ -43,3 +47,20 @@ test.each([
     expect(decodeStatisticsUrl(input)).toBe(expected)
   },
 )
+
+test('keeps the original URL when parsing is unavailable', () => {
+  vi.stubGlobal('URL', undefined)
+  const url: string = 'http://xn--80aaafca4ocd5a.localhost:3100/'
+  expect(decodeStatisticsUrl(url)).toBe(url)
+})
+
+test('keeps the original hostname and URL when the decoder throws', () => {
+  vi.mocked(toUnicode).mockImplementation(() => {
+    throw new RangeError('Invalid input')
+  })
+  expect(decodeStatisticsDomain('xn--e1afmkfd.xn--p1ai')).toBe(
+    'xn--e1afmkfd.xn--p1ai',
+  )
+  const url: string = 'http://xn--80aaafca4ocd5a.localhost:3100/'
+  expect(decodeStatisticsUrl(url)).toBe(url)
+})

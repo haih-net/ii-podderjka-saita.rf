@@ -3,7 +3,7 @@ import type { Request } from 'express'
 import {
   decodeStatisticsDomain,
   decodeStatisticsUrl,
-} from './statisticsDomains'
+} from '../app/components/Statistics/domains'
 import type {
   StatisticsPacket,
   PageViewEvent,
