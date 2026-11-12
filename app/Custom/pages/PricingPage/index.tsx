@@ -11,7 +11,7 @@ export const PricingPage: React.FC = () => (
       <div className="visual-sheet">
         <p className="visual-label">Полное сопровождение</p>
         <p>от</p>
-        <p className="large-value">20 000 ₽</p>
+        <p className="large-value">30 000 ₽</p>
         <span className="period">в месяц · под ключ</span>
         <hr />
         <p>

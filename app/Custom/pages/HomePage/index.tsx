@@ -26,7 +26,7 @@ export const HomePage: React.FC = () => (
               Как я работаю <span aria-hidden="true">↓</span>
             </a>
             <p className="hero-price">
-              <strong>от 20 000 ₽</strong>в месяц · под ключ
+              <strong>от 30 000 ₽</strong>в месяц · под ключ
             </p>
           </div>
         </div>
@@ -167,7 +167,7 @@ export const HomePage: React.FC = () => (
         <div>
           <p className="section-label">Полное сопровождение под ключ</p>
           <h2 id="price-title">
-            от 20 000 ₽<small>в месяц</small>
+            от 30 000 ₽<small>в месяц</small>
           </h2>
           <p>
             Аналитика, технические изменения, материалы и развитие — в одной

@@ -16,7 +16,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   intro,
   visual,
   children,
-  note = 'Полное сопровождение · от 20 000 ₽ в месяц',
+  note = 'Полное сопровождение · от 30 000 ₽ в месяц',
 }) => (
   <LandingStyled>
     <IntroStyled aria-labelledby="page-title">
@@ -89,7 +89,7 @@ export const SupportSummary: React.FC = () => (
         </p>
       </div>
       <div>
-        <h3>От 20 000 ₽ в месяц</h3>
+        <h3>От 30 000 ₽ в месяц</h3>
         <p>
           По итогам месяца вы решаете, продолжать ли работу. Если сразу после
           первого месяца сообщите, что недовольны и не хотите продолжать,
